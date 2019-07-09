@@ -10,8 +10,17 @@ import UIKit
 
 class HypeTableViewController: UITableViewController, UITextFieldDelegate {
     
+    // Reload tableview on swipe down
+    var refresh: UIRefreshControl = UIRefreshControl()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // Reload tableview on swipe down
+        refresh.attributedTitle = NSAttributedString(string: "Pull to see new Hype")
+        refresh.addTarget(self, action: #selector(loadData), for: .valueChanged)
+        self.tableView.addSubview(refresh)
+        
         loadData()
     }
     
@@ -48,12 +57,13 @@ class HypeTableViewController: UITableViewController, UITextFieldDelegate {
     }
     
     // Helper function
-    
-    func loadData() {
+    // Marking as OBJC for the // Reload tableview on swipe down
+    @objc func loadData() {
         HypeController.shared.fetchDemHypes { (success) in
             if success {
                 DispatchQueue.main.async {
                     self.tableView.reloadData()
+                    self.refresh.endRefreshing()
                 }
             }
         }
